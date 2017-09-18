@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="khSearch">
+	<select id="KhSearch_loadKh" resultClass="java.util.HashMap"
+		parameterClass="java.util.Map">
+		select khbh,khmc from khgl_kh
+	</select>
+	
+	<insert id="KhSearch_saveKh" parameterClass="java.util.Map">
+		insert into khgl_kh(khmc) values ('$khmc$') 
+	</insert>
+	
+	<select id="KhSearch_selectKhbhBykKhmc" resultClass="java.lang.String" parameterClass="java.util.Map">
+	     select khbh from khgl_kh where khmc='$khmc$'
+	</select>
+</sqlMap>

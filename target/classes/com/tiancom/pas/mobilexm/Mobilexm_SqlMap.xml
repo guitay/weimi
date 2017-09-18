@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Mobilexm">
+
+	
+	
+	<update id="Mobilexm_insertXmfx" parameterClass="java.util.Map" >
+		insert into wm_xmfx (xmbh,ztbh,fxr,fxnr,picture1,picture2,picture3,sftb,fxsj) values ('$xmbh$','$ztbh$','$ygbh$','$fxnr$','$picture1$','$picture2$','$picture3$','$sftb$',#fxsj:timestamp#)
+	</update>
+	
+	<select id="Mobilexm_selectMgsCountByYgbh" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT count(1)  from wm_mg where ygbh=$ygbh$
+	</select>
+	
+	<select id="Mobilexm_selectMgsByYgbh" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT mgs  from wm_mg where ygbh=$ygbh$
+	</select>
+	
+	<update id="Mobilexm_updateYgbhMgs" parameterClass="java.util.Map" >
+		update wm_mg set mgs=mgs-1 where ygbh=$ygbh$
+	</update>
+	
+	<update id="Mobilexm_updateFxrMgs" parameterClass="java.util.Map" >
+		update wm_mg set mgs=mgs+1 where ygbh=$fxr$
+	</update>
+	
+	<update id="Mobilexm_insertFsjl" parameterClass="java.util.Map" >
+		insert into wm_xmfxfs (xmfxjldh,smr) values ($jldh$,'$ygbh$')
+	</update>
+	
+	<select id="Mobilexm_selectSmrByJldh" parameterClass="java.util.Map" resultClass="java.lang.String">
+		SELECT group_concat(xx order by xh desc) smr from(
+		<![CDATA[SELECT if(count(c.smr)>=9, CONCAT('<span style="color:rgb(255,176,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=6, CONCAT('<span style="color:rgb(255,57,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=3, CONCAT('<span style="color:rgb(255,88,88)">',d.xm,'(+',count(c.smr),')</span>'),CONCAT(d.xm,'(+',count(c.smr),')')))) xx,max(c.xh) xh]]>
+		from wm_xmfxfs c    
+		LEFT JOIN rsgl_ygxx d on c.smr=d.ygbh
+		where c.xmfxjldh=$jldh$
+		GROUP BY d.xm) a
+	</select>
+	
+	<select id="Mobilexm_selectFcfxnr" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT a.jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj,smr,count(b.jldh) bb  from(
+			<![CDATA[SELECT jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj ,group_concat(xx order by xh desc) smr from(
+				select a.jldh,a.fxr,b.xm,e.xmjc,f.ztnr,fxnr,picture1,picture2,picture3,date_format(fxsj,'%m-%d  %H:%i') fxsj,if(count(c.smr)>=9, CONCAT('<span style="color:rgb(255,224,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=6, CONCAT('<span style="color:rgb(255,176,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=3, CONCAT('<span style="color:rgb(255,88,88)">',d.xm,'(+',count(c.smr),')</span>'),CONCAT(d.xm,'(+',count(c.smr),')')))) xx,max(c.xh) xh]]>
+				from wm_xmfx a   
+				inner JOIN rsgl_ygxx b on a.fxr=b.ygbh
+				LEFT JOIN wm_xmfxfs c on a.jldh=c.xmfxjldh   
+				LEFT JOIN rsgl_ygxx d on c.smr=d.ygbh
+				left join xmgl_xmxx e on e.xmbh=a.xmbh
+				LEFT JOIN wm_fxzt f on f.ztbh=a.ztbh  
+				where a.sftb='Y'   
+				GROUP BY a.jldh,d.xm
+			) a GROUP BY jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj ) a
+		left JOIN wm_fxpl b on a.jldh=b.fxjldh
+		GROUP BY a.jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj,smr
+		order by a.jldh desc  limit 10;
+	</select>
+	
+	<select id="Mobilexm_selectFxxq" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj ,group_concat(xx order by xh desc) smr from(
+			<![CDATA[select a.jldh,a.fxr,b.xm,e.xmjc,f.ztnr,fxnr,picture1,picture2,picture3,date_format(fxsj,'%m-%d  %H:%i') fxsj,if(count(c.smr)>=9, CONCAT('<span style="color:rgb(255,224,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=6, CONCAT('<span style="color:rgb(255,176,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=3, CONCAT('<span style="color:rgb(255,88,88)">',d.xm,'(+',count(c.smr),')</span>'),CONCAT(d.xm,'(+',count(c.smr),')')))) xx,max(c.xh) xh]]>
+			from wm_xmfx a   
+			inner JOIN rsgl_ygxx b on a.fxr=b.ygbh
+			LEFT JOIN wm_xmfxfs c on a.jldh=c.xmfxjldh   
+			LEFT JOIN rsgl_ygxx d on c.smr=d.ygbh
+			left join xmgl_xmxx e on e.xmbh=a.xmbh
+			LEFT JOIN wm_fxzt f on f.ztbh=a.ztbh  
+			where a.jldh=$jldh$  
+			GROUP BY a.jldh,d.xm
+		) a GROUP BY jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj
+	</select>
+	
+	<select id="Mobilexm_selectPlxq" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT a.jldh,a.plr,b.xm,plnr
+		from wm_fxpl a
+		inner JOIN rsgl_ygxx b on a.plr=b.ygbh
+		where a.fxjldh=$jldh$
+		order by jldh 
+	</select>
+	
+	<select id="Mobilexm_selectLbPlxq" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT a.fxjldh,a.jldh,a.plr,b.xm,plnr
+		from wm_fxpl a
+		inner JOIN rsgl_ygxx b on a.plr=b.ygbh
+		order by a.fxjldh,jldh 
+	</select>
+	
+	<update id="Mobilexm_insertFxpl" parameterClass="java.util.Map" >
+		insert into wm_fxpl (fxjldh,plr,plnr,plsj) values ('$fxjldh$','$plr$','$plnr$',#plsj:timestamp#)
+	</update>
+	
+	<update id="Mobilexm_deleteFxjl" parameterClass="java.util.Map" >
+		delete from wm_xmfx where jldh=$jldh$ 
+	</update>
+	
+	<update id="Mobilexm_deleteFxPljl" parameterClass="java.util.Map" >
+		delete from wm_fxpl where fxjldh=$jldh$ 
+	</update>
+	
+	<update id="Mobilexm_deletePljl" parameterClass="java.util.Map" >
+		delete from wm_fxpl where jldh=$jldh$ 
+	</update>
+	
+	<select id="Mobilexm_selectZtlist" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT ztbh,ztnr from wm_fxzt where ygbh in (10000,$ygbh$) order by ygbh asc ,ztbh desc
+	</select>
+	
+	<update id="Mobilexm_insertZt" parameterClass="java.util.Map" >
+		insert into wm_fxzt (ygbh,ztnr) values ('$ygbh$','$ztnr$')
+	</update>
+	
+	<select id="Mobilexm_selectZtbh" parameterClass="java.util.Map" resultClass="java.lang.String">
+		SELECT max(ztbh) ztbh from wm_fxzt where ygbh=$ygbh$
+	</select>
+	
+	<select id="Mobilexm_selectFclist" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		
+		SELECT a.jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj,smr,count(b.jldh) bb  from(
+			<![CDATA[SELECT jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj ,group_concat(xx order by xh desc) smr from(
+				select a.jldh,a.fxr,b.xm,e.xmjc,f.ztnr,fxnr,picture1,picture2,picture3,date_format(fxsj,'%m-%d  %H:%i') fxsj,if(count(c.smr)>=9, CONCAT('<span style="color:rgb(255,224,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=6, CONCAT('<span style="color:rgb(255,176,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=3, CONCAT('<span style="color:rgb(255,88,88)">',d.xm,'(+',count(c.smr),')</span>'),CONCAT(d.xm,'(+',count(c.smr),')')))) xx,max(c.xh) xh]]>
+				from wm_xmfx a   
+				inner JOIN rsgl_ygxx b on a.fxr=b.ygbh
+				LEFT JOIN wm_xmfxfs c on a.jldh=c.xmfxjldh   
+				LEFT JOIN rsgl_ygxx d on c.smr=d.ygbh
+				left join xmgl_xmxx e on e.xmbh=a.xmbh
+				LEFT JOIN wm_fxzt f on f.ztbh=a.ztbh  
+				where a.sftb='Y'
+				<isNotEmpty prepend="AND" property="jldh">
+					<![CDATA[a.jldh< $jldh$]]>
+				</isNotEmpty>
+				GROUP BY a.jldh,d.xm
+			) a GROUP BY jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj ) a
+		left JOIN wm_fxpl b on a.jldh=b.fxjldh
+		GROUP BY a.jldh,fxr,xm,xmjc,ztnr,fxnr,picture1,picture2,picture3,fxsj,smr
+		order by a.jldh desc  limit 10;
+	</select>
+</sqlMap>

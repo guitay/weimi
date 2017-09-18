@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="InitUpdate">
+	
+	<resultMap class="com.tiancom.pas.deploy.init.Bxd" id="InitUpdate_ResultMap_Bxd">
+		<result property="bxdh" column="bxdh" jdbcType="INTEGER"/>
+		<result property="bmmc" column="bmmc" jdbcType="VARCHAR"/>
+		<result property="xm" column="xm" jdbcType="VARCHAR"/>
+		<result property="ygbh" column="ygbh" jdbcType="VARCHAR"/>
+		<result property="bmbh" column="bmbh" jdbcType="VARCHAR"/>
+		<result property="bxje" column="bxje" jdbcType="Decimal"/>
+		<result property="bxze" column="bxze" jdbcType="Decimal"/>
+		<result property="bxzt" column="bxzt" jdbcType="INTEGER"/>
+		
+		<result property="taskId" column="taskId" jdbcType="VARCHAR"/>
+		<result property="procInstId" column="procInstId" jdbcType="VARCHAR"/>
+		<result property="procDefId" column="procDefId" jdbcType="VARCHAR"/>
+		<result property="spr_ygbh" column="spr_ygbh" jdbcType="VARCHAR"/>
+		<result property="spr" column="spr" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="Init_selectDeleteProcInstAndRebootProcessBxd" parameterClass="java.util.Map" resultMap="InitUpdate_ResultMap_Bxd">
+	SELECT a.bxdh,d.bmmc,c.xm,a.ygbh,d.bmbh,a.bxje,a.bxje+60*ccts bxze,bxzt,null as taskId,t.procInstId as procInstId ,null as procDefId,
+	 null as spr_ygbh ,null as spr
+				from wm_bxd a
+				INNER JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+				inner join rsgl_ygxx c on c.ygbh=a.ygbh
+				inner join rsgl_bmxx d on d.bmid=a.bxbm
+				inner join (
+					select proc_inst_id_ as procInstId,text_ bxdh
+					from act_ru_variable 
+					where text_ in (44,29) and name_ = 'bxdh' 
+				) t on t.bxdh = a.bxdh 
+	
+	</select>
+	
+	
+	<select id="Init_selectRebootProcessBxd" parameterClass="java.util.Map" resultMap="InitUpdate_ResultMap_Bxd">
+		<![CDATA[
+		SELECT a.bxdh,d.bmmc,c.xm,c.ygbh,d.bmbh,a.bxje,a.bxje+60*ccts bxze,bxzt,null as taskId,null as procInstId ,null as procDefId,
+	 null as spr_ygbh ,null as spr
+				from wm_bxd a
+				INNER JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+				inner join rsgl_ygxx c on c.ygbh=a.ygbh
+				inner join rsgl_bmxx d on d.bmid=c.bmid
+		]]>
+	</select>
+	
+	<!-- 主管已审批的cep流程，自动做进去 -->
+	<select id="Init_selectBxdDsp_CEP_PROC_List" parameterClass="java.util.Map" resultMap="InitUpdate_ResultMap_Bxd">
+		<![CDATA[
+	
+SELECT a.bxdh,d.bmmc,c.xm,c.ygbh,d.bmbh,a.bxje,a.bxje+60*ccts bxze,bxzt,t.taskId,t.procInstId ,t.procDefId,
+	ms.user_id_ as spr_ygbh ,ygxx.xm as spr
+		from wm_bxd a
+		INNER JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+		inner join rsgl_ygxx c on c.ygbh=a.ygbh
+		inner join rsgl_bmxx d on d.bmid=c.bmid
+		inner join (
+			select distinct var.text_ as bxdh,task.id_ as taskId,task.proc_inst_id_ as procInstId, exe.proc_def_id_ as procDefId from act_ru_identitylink idt
+			inner join act_id_membership ms on ms.group_id_ = idt.group_id_ 
+			inner join act_ru_task task on task.id_ = idt.task_id_ and task.task_def_key_ not in('finDept-Auditing','cashier-pay','applier-confirm')
+				and lower(task.task_def_key_) not like 'assistant%' 
+			inner join act_ru_variable var on var.proc_inst_id_ = task.proc_inst_id_ and var.name_ = 'bxdh'
+            inner join act_ru_execution exe on exe.proc_inst_id_ = task.proc_inst_id_ and substr(exe.proc_def_id_,1,3) = 'CEP'
+			where idt.type_ != 'starter' 
+		) t on t.bxdh = a.bxdh
+        inner join act_id_group grp on grp.id_ = d.bmbh+'-auditor' 
+        inner join act_id_membership ms on ms.group_id_ = grp.id_ 
+        inner join rsgl_ygxx ygxx on ygxx.ygbh = ms.user_id_ 
+        where a.bxzt = 2 
+		order by bxdh desc
+		
+		]]>
+	</select>
+	
+	
+</sqlMap>

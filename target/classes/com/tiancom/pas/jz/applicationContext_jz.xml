@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>   
+	<bean id="JZ.JZService" parent="txProxyTemplate">
+		<property name="target">
+			<bean class="com.tiancom.pas.jz.JzServiceImpl">
+                <property name="iBaseDAO" ref="system.IBaseDAO"/>
+                <property name="nbTaskService" ref="Task.TaskService"/>
+			</bean>
+		</property>
+	</bean>	
+</beans>

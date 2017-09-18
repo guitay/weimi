@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Mobilew">
+
+	<delete id="Mobilew_zxbd" parameterClass="java.util.Map">
+		delete from rsgl_wxbd where openid='$openid$'
+	</delete>
+	
+	<resultMap class="com.tiancom.pas.mobilew.Bxd" id="Mobilew_ResultMap_Bxd">
+		<result property="bxdh" column="bxdh" jdbcType="INTEGER"/>
+		<result property="xmjc" column="xmjc" jdbcType="VARCHAR"/>
+		<result property="bxbm" column="bxbm" jdbcType="INTEGER"/>
+		<result property="bmmc" column="bmmc" jdbcType="VARCHAR"/>
+		<result property="xm" column="xm" jdbcType="VARCHAR"/>
+		<result property="qsrq" column="qsrq" jdbcType="INTEGER"/>
+		<result property="jsrq" column="jsrq" jdbcType="INTEGER"/>
+		<result property="bxje" column="bxje" jdbcType="DECIMAL"/>
+		<result property="bxze" column="bxze" jdbcType="DECIMAL"/>
+		<result property="bxzt" column="bxzt" jdbcType="INTEGER"/>
+		<result property="xgyj" column="xgyj" jdbcType="VARCHAR"/>
+		<result property="ccts" column="ccts" jdbcType="INTEGER"/>
+		<result property="taskId" column="taskId" jdbcType="VARCHAR"/>
+		<result property="procInstId" column="procInstId" jdbcType="VARCHAR"/>
+		<result property="taskFlow" column="procInstId" select="Mobilew_selectBxdTaskFlows"/>
+	
+	</resultMap>
+	
+	<select id="Mobilew_selectBxdLb" parameterClass="java.util.Map" resultMap="Mobilew_ResultMap_Bxd">
+		<![CDATA[
+		SELECT distinct a.bxdh,a.bxbm, null as bmmc,null as xm,ifnull(b.xmjc,c.khmc)xmjc,a.qsrq,a.jsrq,a.ccts,a.bxje,a.bxje+60*ccts bxze,t.bxzt,a.xgyj ,t.taskId,t.procInstId
+		from wm_bxd a
+		left JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+		left JOIN khgl_kh c on a.khbh=c.khbh
+		inner join (
+			select varinst.text_ as bxdh, '已完成' bxzt ,idt.task_id_ as taskId ,idt.proc_inst_id_ as procInstId
+			from ACT_HI_IDENTITYLINK idt
+			inner join act_hi_varinst varinst on idt.proc_inst_id_ = varinst.proc_inst_id_ and varinst.name_ = 'bxdh'
+			inner join act_hi_procinst procinst on procinst.PROC_INST_ID_ = idt.proc_inst_id_ and END_ACT_ID_ is not null
+			where idt.type_='starter' and user_id_ = #ygbh#
+			union all
+			select varinst.text_ as bxdh ,'审批中' bxzt ,task.id_ as taskId ,idt.proc_inst_id_ as procInstId
+            from ACT_ru_IDENTITYLINK idt
+			inner join act_ru_variable varinst on idt.proc_inst_id_ = varinst.proc_inst_id_ and varinst.name_ = 'bxdh'
+			inner join act_ru_task task on task.proc_inst_id_ = idt.proc_inst_id_ 
+            inner join act_ru_execution exec on exec.proc_inst_id_ = idt.proc_inst_id_ and lower(exec.act_id_) not like '%apply'
+			where idt.type_='starter' and idt.user_id_ = #ygbh#
+		) t on t.bxdh = a.bxdh 
+		order by bxdh desc
+		]]>
+	</select>
+	<select id="Mobilew_selectBxdLb_btg" parameterClass="java.util.Map" resultMap="Mobilew_ResultMap_Bxd">
+		<![CDATA[
+		SELECT distinct a.bxdh,a.bxbm, null as bmmc,null as xm,ifnull(b.xmjc,c.khmc)xmjc,a.qsrq,a.jsrq,a.ccts,a.bxje,a.bxje+60*ccts bxze,xgyj,t.bxzt,t.taskId,t.procInstId 
+		from wm_bxd a
+		left JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+		left JOIN khgl_kh c on a.khbh=c.khbh
+		inner join (
+			select varinst.text_ as bxdh ,'被退回' bxzt ,task.id_ as taskId,idt.proc_inst_id_ as procInstId
+            from ACT_ru_IDENTITYLINK idt
+			inner join act_ru_variable varinst on idt.proc_inst_id_ = varinst.proc_inst_id_ and varinst.name_ = 'bxdh'
+			inner join act_ru_task task on task.proc_inst_id_ = idt.proc_inst_id_
+            inner join act_ru_execution exec on exec.proc_inst_id_ = idt.proc_inst_id_ and lower(exec.act_id_) like '%apply'
+			where idt.type_='starter' and idt.user_id_ = #ygbh#
+		) t on t.bxdh = a.bxdh 
+		order by bxdh desc]]>
+	</select>
+	
+	<select id="Mobilew_selectBxdTaskFlows" parameterClass="java.lang.String" resultClass="com.tiancom.pas.activiti.bean.TaskFlow">
+		select id_ as taskId , proc_inst_id_ as procInstId,name_ as name , assignee_ as assignee ,start_time_ as startTime ,claim_time_ as claimTime, end_time_ endTime 
+		from act_hi_taskinst where proc_inst_id_ = #procInstId#
+		order by start_time_
+	</select>
+	
+	
+	<select id="Mobilew_selectBxdxq" parameterClass="java.util.Map" resultMap="Mobilew_ResultMap_Bxd">
+
+		SELECT distinct a.bxdh,case when CHAR_LENGTH(xmjc)>12 then CONCAT(left(xmjc,12),'...') else xmjc end as xmjc,
+		a.qsrq,a.jsrq,a.bxje,a.bxze,a.bxzt,a.ccts ,
+		a.bxbm,a.bmmc as bmmc,null as xm,null as xgyj,
+		null as taskId,vi.proc_inst_id_ as procInstId
+		from (
+			SELECT a.bxdh,ifnull(b.xmjc,c.khmc)xmjc,a.qsrq,a.jsrq,a.bxje,a.bxje+60*ccts bxze,bxzt,ccts ,a.bxbm,d.bmmc 
+			from wm_bxd a
+			left JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+			left JOIN khgl_kh c on a.khbh=c.khbh
+			inner join rsgl_bmxx d on a.bxbm=d.bmid
+			where bxdh=$bxdh$ 
+		)a
+		left join act_hi_varinst vi on vi.name_ = 'bxdh' and vi.text_ = a.bxdh 
+
+	</select>
+	
+	<select id="Mobilew_selectBxdZdxq" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT zdbh,zdlx,zdje,zdsm,rq from wm_zd 
+		where bxdh=$bxdh$ 
+		order BY rq desc
+	</select>
+	
+	<resultMap id="Mobilew_result_selectBxdZdxq" class="com.tiancom.pas.mobilew.Zdxq">
+		<result property="bxdh" column="bxdh" jdbcType="INTEGER"/>
+		<result property="zdlx" column="zdlx" jdbcType="VARCHAR"/>
+		<result property="zdje" column="zdje" jdbcType="DECIMAL"/>
+		<result property="zdsm" column="{bxdh=bxdh,zdlx=zdlx}" select="Mobilew_selectBxdZdsm"/>
+	</resultMap>
+	
+	<select id="Mobilew_selectBxdZdxqHz" parameterClass="java.util.Map" resultMap="Mobilew_result_selectBxdZdxq">
+	<![CDATA[
+		SELECT bxdh,zdlx,sum(zdje) zdje,null as zdsm 
+			from wm_zd 
+			where bxdh=#bxdh# 
+			GROUP BY bxdh,zdlx 
+	]]>
+	</select>
+	
+	<select id="Mobilew_selectBxdZdsm" resultClass="java.lang.String">
+		<![CDATA[
+		select concat('<br>&bull;',zdsm) as zdsm from wm_zd where bxdh = #bxdh# and zdlx = #zdlx# and zdsm is not null and trim(zdsm)!=''
+		order by rq desc
+		]]>
+	</select>
+	
+	<delete id="Mobilew_deleteBxd" parameterClass="java.util.Map">
+		delete from wm_bxd where bxdh=$bxdh$ 
+	</delete>
+	
+	<update id="Mobilew_updateZd" parameterClass="java.util.Map" >
+		UPDATE wm_zd set bxdh=null where bxdh=$bxdh$
+	</update>
+	
+	<update id="Mobilew_updateBxd" parameterClass="java.util.Map" >
+		UPDATE wm_bxd set bxje=(select sum(zdje) from wm_zd where bxdh=(select bxdh from wm_zd where zdbh=$zdbh$ )) 
+		where bxdh= (select bxdh from wm_zd where zdbh=$zdbh$ )
+	</update>
+	
+	<!-- 
+	<select id="Mobilew_selectBxspLb" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT a.bxdh,d.bmmc,c.xm,b.xmjc,a.qsrq,a.jsrq,a.bxje+60*ccts bxze,bxzt 
+		from wm_bxd a
+		INNER JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+		inner join rsgl_ygxx c on c.ygbh=a.ygbh
+		inner join rsgl_bmxx d on d.bmid=c.bmid
+		where  bxzt=1 and a.bxbm = (SELECT bmid from rsgl_ygxx where ygbh=$ygbh$) order by bxdh desc
+	</select>
+	 -->
+	<!-- 待审批列表 -->
+	<select id="Mobilew_selectBxspLb" parameterClass="java.util.Map" resultMap="Mobilew_ResultMap_Bxd">
+		SELECT a.bxdh,a.bxbm,d.bmmc,c.xm,ifnull(b.xmjc,e.khmc)xmjc,a.qsrq,a.jsrq,a.ccts,a.bxje,a.bxje+60*ccts bxze,bxzt,null as xgyj,taskId as taskId,t.procInstId 
+		from wm_bxd a
+		left JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+		inner join rsgl_ygxx c on c.ygbh=a.ygbh
+		inner join rsgl_bmxx d on d.bmid=c.bmid
+		left JOIN khgl_kh e on a.khbh=e.khbh
+		inner join (
+			select distinct var.text_ as bxdh,task.id_ as taskId,task.proc_inst_id_ as procInstId from act_ru_identitylink idt
+			inner join act_id_membership ms on ms.group_id_ = idt.group_id_ and ms.user_id_ = #ygbh#
+			inner join act_ru_task task on task.id_ = idt.task_id_ and task.task_def_key_ not in('finDept-Auditing','cashier-pay','applier-confirm')
+				and lower(task.task_def_key_) not like 'assistant%' 
+			inner join act_ru_variable var on var.proc_inst_id_ = task.proc_inst_id_ and var.name_ = 'bxdh'
+			where idt.type_ != 'starter' 
+		) t on t.bxdh = a.bxdh
+		order by bxdh desc
+	</select>
+	
+	<!-- 已审批列表 -->
+	<select id="Mobilew_selectBxYspLb" parameterClass="java.util.Map" resultMap="Mobilew_ResultMap_Bxd">
+		SELECT a.bxdh,a.bxbm,d.bmmc,c.xm,ifnull(b.xmjc,e.khmc)xmjc,a.qsrq,a.jsrq,a.ccts,a.bxje,a.bxje+60*ccts bxze,bxzt,a.xgyj,null as taskId,t.procInstId
+		from wm_bxd a
+		left JOIN xmgl_xmxx b on a.xmbh=b.xmbh
+		inner join rsgl_ygxx c on c.ygbh=a.ygbh
+		inner join rsgl_bmxx d on d.bmid=c.bmid
+		left JOIN khgl_kh e on a.khbh=e.khbh
+		inner join (
+			select distinct var.text_ as bxdh,var.proc_inst_id_ as procInstId from act_hi_identitylink idt
+			inner join act_hi_varinst var on var.proc_inst_id_ = idt.proc_inst_id_ and var.name_ = 'bxdh'
+            inner join act_hi_actinst actinst on actinst.proc_inst_id_ = idt.proc_inst_id_ and actinst.assignee_ = #ygbh#
+			and var.text_ not in (
+				select distinct var.text_ as bxdh from act_ru_identitylink idt
+				inner join act_id_membership ms on ms.group_id_ = idt.group_id_ and ms.user_id_ = #ygbh#
+				inner join act_ru_task task on task.id_ = idt.task_id_
+				inner join act_ru_variable var on var.proc_inst_id_ = task.proc_inst_id_ and var.name_ = 'bxdh'
+				where idt.type_ != 'starter' 
+			)  
+			where idt.type_ != 'starter' and idt.user_id_ = #ygbh# 
+		) t on t.bxdh = a.bxdh 
+		
+		order by bxdh desc
+		
+	</select>
+	
+	<update id="Mobilew_TyBxd" parameterClass="java.util.Map" >
+		UPDATE wm_bxd set bxzt=2 
+		where bxdh= $bxdh$
+	</update>
+	
+	<update id="Mobilew_BtyBxd" parameterClass="java.util.Map" >
+		UPDATE wm_bxd set bxzt=-1 ,xgyj='$xgyj$'
+		where bxdh= $bxdh$
+	</update>
+	
+	<update id="Mobilew_updateBxdZt" parameterClass="java.util.Map" >
+		UPDATE wm_bxd set bxje='$bxje$',qsrq='$qsrq$',jsrq='$jsrq$',ccts='$ccts$' ,bxbm='$bxbm$'
+		where bxdh= $bxdh$
+	</update>
+	
+	<select id="Mobilew_getGw" parameterClass="java.util.Map" resultClass="java.lang.String">
+		SELECT gwbh from rsgl_ygxx
+		where  ygbh= $ygbh$
+	</select>
+	
+	<update id="Mobilew_Szqr" parameterClass="java.util.Map" >
+		UPDATE wm_bxd set bxzt=5 
+		where bxdh= $bxdh$
+	</update>
+	
+</sqlMap>

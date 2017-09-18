@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Mobilecqgl">
+
+<select id="Mobilecqgl_selectRqysList" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT kqrq,zt, case when zt in (0,4) then 0 when zt=2 then 1 else xgbz end xgbz
+		from (
+		select sjw.tjrq kqrq, CASE WHEN sjw.TJRQ<= (SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d'))  THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 0  ELSE 1 END)
+		                      WHEN sjw.TJRQ>(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d')) AND SJW.TJRQ<=(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE(SYSDATE()))),'%Y%m%d') ) THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 2  ELSE 3 END)
+		                      ELSE 4 END zt, 1 xgbz 
+		from csb_sjw sjw
+		inner join csb_sjw sjw2 on sjw.tjrq between sjw2.yc and sjw2.ym
+		left join xtb_xtcs cs on cs.csmc='SYS_KQTS'
+		left join kqgl_ygkqjl kqjl on sjw.tjrq=kqjl.kqrq and kqjl.ygid=$ygid$
+		where sjw2.tjrq=$kqrq$ and exists (select 1 from kqgl_ygkqnr kqnr where kqjl.jldh=kqnr.jldh and kqnr.ywfy='1')
+		  and not exists (select 1
+							from CWGL_FYBXD bxd, cwgl_fybxdmx  clbx   
+							where  bxd.bxdh=clbx.bxdh  and kqjl.jldh=clbx.jldh  and bxd.zt in ('0','1')
+							union ALL
+							select 1
+							from CWGL_FYBXD bxd, cwgl_bxdmx_bdfy  bdbx   
+							where  bxd.bxdh=bdbx.bxdh  and kqjl.jldh=bdbx.jldh and bxd.zt in ('0','1'))
+		union all
+        select sjw.tjrq kqrq, CASE WHEN sjw.TJRQ<= (SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d'))  THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 0  ELSE 1 END)
+		                      WHEN sjw.TJRQ>(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d')) AND SJW.TJRQ<=(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE(SYSDATE()))),'%Y%m%d') ) THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 2  ELSE 3 END)
+		                      ELSE 4 END zt, CASE WHEN sjw.TJRQ>(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d')) AND SJW.TJRQ<=(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE(SYSDATE()))),'%Y%m%d') ) then 1 else 0 end xgbz 
+		from csb_sjw sjw
+		inner join csb_sjw sjw2 on sjw.tjrq between sjw2.yc and sjw2.ym
+		left join xtb_xtcs cs on cs.csmc='SYS_KQTS'
+		left join kqgl_ygkqjl kqjl on sjw.tjrq=kqjl.kqrq and kqjl.ygid=$ygid$
+		where sjw2.tjrq=$kqrq$ and not exists (select 1 from kqgl_ygkqnr kqnr where kqjl.jldh=kqnr.jldh and kqnr.ywfy='1')
+		  and not exists (select 1
+						from CWGL_FYBXD bxd, cwgl_fybxdmx  clbx   
+						where  bxd.bxdh=clbx.bxdh  and kqjl.jldh=clbx.jldh  and bxd.zt in ('0','1')
+						union ALL
+						select 1
+						from CWGL_FYBXD bxd, cwgl_bxdmx_bdfy  bdbx   
+						where  bxd.bxdh=bdbx.bxdh  and kqjl.jldh=bdbx.jldh and bxd.zt in ('0','1'))		
+		union ALL
+		select sjw.tjrq kqrq, CASE WHEN sjw.TJRQ<= (SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d'))  THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 0  ELSE 1 END)
+		                      WHEN sjw.TJRQ>(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d')) AND SJW.TJRQ<=(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE(SYSDATE()))),'%Y%m%d') ) THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 2  ELSE 3 END)
+		                      ELSE 4 END zt,0 xgbz
+		from csb_sjw sjw
+		inner join csb_sjw sjw2 on sjw.tjrq between sjw2.yc and sjw2.ym
+		left join xtb_xtcs cs on cs.csmc='SYS_KQTS'
+		left join kqgl_ygkqjl kqjl on sjw.tjrq=kqjl.kqrq and kqjl.ygid=$ygid$
+		where sjw2.tjrq=$kqrq$ 
+		  and exists (select 1
+					from CWGL_FYBXD bxd, cwgl_fybxdmx  clbx   
+					where  bxd.bxdh=clbx.bxdh  and kqjl.jldh=clbx.jldh  and bxd.zt in ('0','1')
+					union ALL
+					select 1
+					from CWGL_FYBXD bxd, cwgl_bxdmx_bdfy  bdbx   
+					where  bxd.bxdh=bdbx.bxdh  and kqjl.jldh=bdbx.jldh and bxd.zt in ('0','1') )
+		 ) a
+		order by 1
+		]]>
+	</select>
+	<select id="Mobilecqgl_selectQdls" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select DISTINCT a.xmbh,a.xmjc,case when CHAR_LENGTH(a.xmjc)>6 then CONCAT(left(a.xmjc,6),'...') else a.xmjc end as xmjc2 ,lx
+		from (
+		select jldh,a.xmbh,b.xmjc,'xm' lx
+		from kqgl_ygqd a
+		INNER JOIN xmgl_xmxx b on b.xmbh=a.xmbh
+		where a.ygid=$ygid$ 
+		union all
+		select jldh,a.khbh xmbh,b.khmc xmjc,'kh' lx
+		from kqgl_ygqd a
+		INNER JOIN khgl_kh b on b.khbh=a.khbh
+		where a.ygid=$ygid$ ) a
+		order by a.jldh desc LIMIT 4
+	</select>
+	
+	<select id="Mobilecqgl_selectZdls" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select DISTINCT a.xmbh,a.xmjc,case when CHAR_LENGTH(a.xmjc)>6 then CONCAT(left(a.xmjc,6),'...') else a.xmjc end as xmjc2,lx
+		from (
+		select zdbh,a.xmbh,b.xmjc,'xm' lx
+		from wm_zd a
+		INNER JOIN xmgl_xmxx b on b.xmbh=a.xmbh
+		where a.ygbh=$ygbh$ 
+		union all
+		select zdbh,a.khbh xmbh,b.khmc xmjc,'kh' lx
+		from wm_zd a
+		INNER JOIN khgl_kh b on b.khbh=a.khbh
+		where a.ygbh=$ygbh$ ) a
+		order by a.zdbh desc LIMIT 4
+	</select>
+	
+	<select id="Mobilecqgl_selectDpls" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select DISTINCT a.xmbh,a.xmjc,case when CHAR_LENGTH(a.xmjc)>6 then CONCAT(left(a.xmjc,6),'...') else a.xmjc end as xmjc2,lx
+		from (
+		select ddbh,a.xmbh,b.xmjc,'xm' lx
+		from wm_jpdd a
+		INNER JOIN xmgl_xmxx b on b.xmbh=a.xmbh
+		where a.ygbh=$ygbh$ 
+		union all
+		select ddbh,a.khbh xmbh,b.khmc xmjc,'kh' lx
+		from wm_jpdd a
+		INNER JOIN khgl_kh b on b.khbh=a.khbh
+		where a.ygbh=$ygbh$ ) a
+		order by a.ddbh desc LIMIT 4
+	</select>
+	
+	<insert id="Mobilecqgl_deleteQdls" parameterClass="java.util.Map">
+		delete from kqgl_ygqd where ygid=$ygid$ and qdrq=$qdrq$ 
+		<isNotEmpty property="xmbh" prepend="and">
+			xmbh=#xmbh#
+		</isNotEmpty>
+		<isNotEmpty property="khbh" prepend="and">
+			khbh=#khbh#
+		</isNotEmpty>
+	</insert>
+	
+	<insert id="Mobilecqgl_insertYgqd" parameterClass="java.util.Map">
+		insert into kqgl_ygqd(ygid,xmbh,khbh,gzsj,qdrq,jlnr,qdsj) values($ygid$,#xmbh#,#khbh#,$gzsj$,$qdrq$,'$jlnr$',#qdsj:timestamp#)
+	</insert>
+	
+	<select id="Mobilecqgl_selectCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+	     select count(1) from kqgl_ygqd where ygid=$ygid$ and qdrq=$qdrq$ 
+		<isNotEmpty property="xmbh" prepend="and">
+			xmbh=#xmbh#
+		</isNotEmpty>
+		<isNotEmpty property="khbh" prepend="and">
+			khbh=#khbh#
+		</isNotEmpty>
+	</select>
+	<select id="Mobilecqgl_selectGzsj" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+	     select sum(gzsj) from kqgl_ygqd where ygid=$ygid$ and qdrq=$qdrq$ 
+		<isNotEmpty property="xmbh" prepend="and">
+			(xmbh!=#xmbh# or xmbh is null)
+		</isNotEmpty>
+		<isNotEmpty property="khbh" prepend="and">
+			(khbh!=#khbh# or khbh is null)
+		</isNotEmpty>
+	</select>
+	
+	<select id="Mobilecqgl_selectYgByYgbh" resultClass="java.util.HashMap" parameterClass="java.lang.String">
+	     select yg.ygid,yg.xm,yg.bmid,bm.bmbh from rsgl_ygxx yg
+ 		 left join rsgl_bmxx bm on bm.bmid = yg.bmid  
+ 		 where yg.ygbh=$ygbh$
+          
+	</select>
+	
+	<select id="Mobilecqgl_selectXm" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select distinct xmbh,xmjc as xmmc,case when length(coalesce(sf,'其他'))=0 then '其他' else coalesce(sf,'其他') end as sf from xmgl_xmxx where sflx ='1' ORDER BY convert( xmjc USING gbk )  COLLATE gbk_chinese_ci
+	</select>
+	<select id="Mobilecqgl_selectSf" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select distinct case when length(coalesce(sf,'其他'))=0 then '其他' else coalesce(sf,'其他') end as sf from xmgl_xmxx where sflx ='1' ORDER BY convert( case when length(coalesce(sf,'重'))=0 then '重' else coalesce(sf,'重') end USING gbk )  COLLATE gbk_chinese_ci
+	</select>
+	
+	<select id="Mobilecqgl_selectQdls2" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select case dayofweek(qdrq) when 1 then '周日' when 2 then '周一' when 3 then '周二' when 4 then '周三' when 5 then '周四' when 6 then '周五' when 7 then '周六' end xq,DATE_FORMAT(qdrq,'%m-%d') rq,xmjc,gzsj,jlnr,DATE_FORMAT(qdrq,'%Y-%m-%d') qdrq,jldh
+		from (
+		select qdrq,xmjc,gzsj,jlnr,jldh
+		from kqgl_ygqd a
+		INNER JOIN xmgl_xmxx b on b.xmbh=a.xmbh
+		where a.ygid=$ygid$
+		UNION all
+		select qdrq,khmc xmjc,gzsj,jlnr,jldh
+		from kqgl_ygqd a
+		INNER JOIN khgl_kh b on b.khbh=a.khbh
+		where a.ygid=$ygid$
+		) a
+		order by qdrq desc,a.jldh desc 
+	</select>
+	
+	<select id="Mobilecqgl_selectQdls3" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select qdrq,count(1) jls
+		from kqgl_ygqd 
+		where ygid=$ygid$ 
+		group by qdrq
+		order by qdrq desc
+	</select>
+	
+	<delete id="Mobilecqgl_deleteJl" parameterClass="java.util.Map">
+		delete from kqgl_ygqd where jldh=$jldh$ 
+	</delete>
+	
+	<select id="Mobilecqgl_selectXmlb" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select xmbh,xmmc,round(ifnull(zgzsj,0),1) zgzsj,xmjd,max(sfgz) sfgz from(
+			select a.xmbh,a.xmjc as xmmc,sum(gzsj)/8 zgzsj,ifnull(d.xmjd,f.xmjd) xmjd,'1' sfgz
+			from xmgl_xmxx a
+			left join kqgl_ygqd b on a.xmbh=b.xmbh
+			inner join wm_xmgz c on c.ygbh=$ygbh$ and c.xmbh=a.xmbh
+			LEFT JOIN wm_xmzb d on d.xmjc=a.xmjc and d.lrsj=(select max(lrsj) from wm_xmzb where xmjc=a.xmjc)
+			LEFT JOIN wm_xmzb f on f.khjc=a.khjc and f.lrsj=(select max(lrsj) from wm_xmzb where khjc=a.khjc) and d.xmjc is null
+			where a.sflx ='1' and c.czlx="新增"
+			group by a.xmbh   
+			union all
+			select a.xmbh,a.xmjc as xmmc,zgzsj,ifnull(d.xmjd,f.xmjd) xmjd, sfgz 
+			from (
+				select a.xmbh,a.xmjc as xmmc,sum(gzsj)/8 zgzsj,a.xmjc,a.khjc,'0' sfgz 
+				from xmgl_xmxx a    
+				inner join kqgl_ygqd b on a.xmbh=b.xmbh    
+				where a.sflx ='1' 
+				and b.xmbh in (select DISTINCT e.xmbh from kqgl_ygqd e,rsgl_ygxx c where e.ygid=c.ygid and c.ygbh=$ygbh$)    
+				group by a.xmbh,a.xmjc,a.khjc
+			) a
+			LEFT JOIN wm_xmzb d on d.xmjc=a.xmjc and d.lrsj=(select max(lrsj) from wm_xmzb where xmjc=a.xmjc)    
+			LEFT JOIN wm_xmzb f on f.khjc=a.khjc and f.lrsj=(select max(lrsj) from wm_xmzb where khjc=a.khjc) and d.xmjc is null
+		) a group by xmbh,xmmc,zgzsj,xmjd
+		order by sfgz desc,zgzsj desc,convert( xmmc USING gbk )  COLLATE gbk_chinese_ci
+	</select>
+	
+	<select id="Mobilecqgl_selectXmxq" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	<![CDATA[
+		select a.xmjc,ifnull(c.htlxmc,'&nbsp;') htlxmc,ifnull(ifnull(d.xmjd,f.xmjd),'&nbsp;') xmjd,ifnull(d.fxdj,f.fxdj) fxdj,
+		(select ifnull(ROUND(sum(gzsj)/8,1),0) from kqgl_ygqd where xmbh=$xmbh$ ) zgzsj,
+		(select count(1) from wm_xmgz where czlx="新增" and xmbh=$xmbh$ and ygbh=$ygbh$) sfgz,ifnull(e.xm,'&nbsp;') xsjl
+		from xmgl_xmxx a
+		LEFT JOIN htgl_htlx c on c.htlx=a.htlx
+		LEFT JOIN wm_xmzb d on d.xmjc=a.xmjc and d.lrsj=(select max(lrsj) from wm_xmzb where xmjc=a.xmjc)
+		LEFT JOIN wm_xmzb f on f.khjc=a.khjc and f.lrsj=(select max(lrsj) from wm_xmzb where khjc=a.khjc) and (d.xmjc is null or  d.xmjc='')
+		left join rsgl_ygxx e on e.ygbh=a.xsjl
+		where a.xmbh=$xmbh$  ]]>
+	</select>
+	
+	<insert id="Mobilecqgl_insertGz" parameterClass="java.util.Map">
+		insert into wm_xmgz (ygbh,xmbh,czlx,czsj)
+		VALUES($ygbh$,$xmbh$,'新增',#czsj:timestamp#)
+	</insert>
+	
+	<update id="Mobilecqgl_updateGz" parameterClass="java.util.Map">
+		update wm_xmgz set czlx='删除' where ygbh=$ygbh$ and xmbh=$xmbh$
+	</update>
+	
+	<select id="Mobilecqgl_selectXmzj" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select e.xm ,ifnull(ROUND(sum(gzsj)/8,1),0) zgzsj
+		from kqgl_ygqd a
+		inner join rsgl_ygxx e on e.ygid=a.ygid
+		where a.xmbh=$xmbh$ and e.bmid in (10,23,24,25,26,27)
+		group by e.xm
+		order by 2 desc
+	</select>
+	
+	<select id="Mobilecqgl_selectXmzxs" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select e.xm ,ifnull(ROUND(sum(gzsj)/8,1),0) zgzsj
+		from kqgl_ygqd a
+		inner join rsgl_ygxx e on e.ygid=a.ygid
+		where a.xmbh=$xmbh$ and e.bmid in (6,19,20,21,22,34)
+		group by e.xm
+		order by 2 desc
+	</select>
+	
+	<select id="Mobilecqgl_selectXmgcs" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select e.xm ,ifnull(ROUND(sum(gzsj)/8,1),0) zgzsj
+		from kqgl_ygqd a
+		inner join rsgl_ygxx e on e.ygid=a.ygid
+		where a.xmbh=$xmbh$ and e.bmid in (11,15,16,17,18,12,36,37,38,39)
+		group by e.xm
+		order by 2 desc 
+	</select>
+	
+	<select id="Mobilecqgl_selectXmzc" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select e.xm ,ifnull(ROUND(sum(gzsj)/8,1),0) zgzsj
+		from kqgl_ygqd a
+		inner join rsgl_ygxx e on e.ygid=a.ygid
+		where a.xmbh=$xmbh$ and e.bmid not in (6,19,20,21,22,34,10,23,24,25,26,27,11,15,16,17,18,12,36,37,38,39)
+		group by e.xm
+		order by 2 desc 
+	</select>
+	
+	<select id="Mobilecqgl_selectXmzbnr" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select ifnull(d.bzxmjz_xg,f.bzxmjz_xg) bzxmjz_xg,
+			ifnull(d.xzgzjh_xg,f.xzgzjh_xg) xzgzjh_xg,
+			ifnull(d.bzxmjz_zx,f.bzxmjz_zx) bzxmjz_zx,
+			ifnull(d.xzgzjh_zx,f.xzgzjh_zx) xzgzjh_zx,
+			ifnull(d.bzxmjz_jfzx,f.bzxmjz_jfzx) bzxmjz_jfzx,
+			ifnull(d.xzgzjh_jfzx,f.xzgzjh_jfzx) xzgzjh_jfzx,
+			ifnull(d.bzxmjz_jf,f.bzxmjz_jf) bzxmjz_jf,
+			ifnull(d.xzgzjh_jf,f.xzgzjh_jf) xzgzjh_jf,
+			ifnull(d.fxjfa,f.fxjfa) fxjfa,concat('第',b.week,'周(',b.sjqj,')') sj
+		from xmgl_xmxx a
+		LEFT JOIN wm_xmzb d on d.xmjc=a.xmjc  
+		LEFT JOIN wm_xmzb f on f.khjc=a.khjc and d.xmjc is null
+		inner JOIN csb_sjw b on date_format(date_sub(ifnull(d.lrsj,f.lrsj),interval 7 day),'%Y%m%d')=b.tjrq
+		where a.xmbh=$xmbh$
+		order by d.lrsj desc,f.lrsj desc
+	</select>
+	
+	<select id="Mobilecqgl_selectMgcount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+	     select count(1) from wm_mg where ygbh=$ygbh$
+	</select>
+	
+	<select id="Mobilecqgl_selectWsjmds" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+	     select wsjmds from wm_mg where ygbh=$ygbh$
+	</select>
+	
+	<insert id="Mobilecqgl_insertMg" parameterClass="java.util.Map">
+		insert into wm_mg (ygbh,wsjmds,ysjmds,mgs)
+		VALUES( $ygbh$,1,0,0 )
+	</insert>
+	
+	<update id="Mobilecqgl_updateMg" parameterClass="java.util.Map">
+		update wm_mg set wsjmds=wsjmds+1 where ygbh=$ygbh$
+	</update>
+	
+	<update id="Mobilecqgl_updateMg2" parameterClass="java.util.Map">
+		update wm_mg set wsjmds=wsjmds-1 where ygbh=$ygbh$
+	</update>
+	
+	<select id="Mobilecqgl_selectXmfxnr" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+	
+		SELECT jldh,fxr,xm,ztnr,fxnr,picture1,picture2,picture3,fxsj ,group_concat(xx order by xh desc) smr from(
+		<![CDATA[select a.jldh,a.fxr,b.xm,f.ztnr,fxnr,picture1,picture2,picture3,date_format(fxsj,'%m-%d  %H:%i') fxsj,if(count(c.smr)>=9, CONCAT('<span style="color:rgb(255,176,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=6, CONCAT('<span style="color:rgb(255,57,0)">',d.xm,'(+',count(c.smr),')</span>'),if(count(c.smr)>=3, CONCAT('<span style="color:rgb(255,88,88)">',d.xm,'(+',count(c.smr),')</span>'),CONCAT(d.xm,'(+',count(c.smr),')')))) xx,max(c.xh) xh]]>
+		from wm_xmfx a   
+		inner JOIN rsgl_ygxx b on a.fxr=b.ygbh
+		LEFT JOIN wm_xmfxfs c on a.jldh=c.xmfxjldh   
+		LEFT JOIN rsgl_ygxx d on c.smr=d.ygbh
+		LEFT JOIN wm_fxzt f on f.ztbh=a.ztbh  
+		where a.xmbh=$xmbh$   
+		GROUP BY a.jldh,d.xm) a GROUP BY jldh,fxr,xm,ztnr,fxnr,picture1,picture2,picture3,fxsj
+		order by jldh desc  
+		
+	</select>
+	
+	<select id="Mobilecqgl_selectJlnr" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		SELECT b.xm,a.qdrq,a.jlnr from kqgl_ygqd a 
+		INNER JOIN rsgl_ygxx b on a.ygid=b.ygid
+		where a.xmbh=$xmbh$ and a.jlnr!='' and a.jlnr is not null
+		order by a.qdrq desc,a.qdsj desc
+	</select>
+	
+	
+	
+</sqlMap>

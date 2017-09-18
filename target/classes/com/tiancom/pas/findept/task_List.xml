@@ -1,0 +1,10 @@
+<table id="task" width="800" height="400" page="true">
+	
+	<col id="operation" title="操作" width="100" align="center" hidden="false" />
+	<col id="processInstanceId" title="实例id" width="100" hidden="false" />
+	<col id="id" title="任务id" width="100" hidden="false" />	
+	<col id="processName" title="流程名称" width="250" hidden="false" />
+	<col id="name" title="任务名称" width="100" hidden="false" />
+	<col id="createTime" title="创建时间" width="300" hidden="false" />
+	
+</table>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="QA">
+
+	<resultMap class="com.tiancom.pas.qa.QA" id="QA_ResultMap_QA">
+		<result property="wtid" column="wtid" jdbcType="INTEGER"/>
+		<result property="flid" column="flid" jdbcType="VARCHAR"/>
+		<result property="bzwt" column="bzwt" jdbcType="VARCHAR"/>
+		<result property="dnda" column="dnda" jdbcType="VARCHAR"/>
+		<result property="dwda" column="dwda" jdbcType="VARCHAR"/>
+		<result property="wjm" column="wjm" jdbcType="VARCHAR"/>
+	</resultMap>
+	<select id="QA_selectByKEY" parameterClass="java.util.Map" resultMap="QA_ResultMap_QA">
+		select wtid,flid,bzwt,dnda,dwda,wjm from wm_qa 
+		where wtid = #wtid#
+	</select>
+	<select id="QA_selectQaByCondition" parameterClass="java.util.Map" resultMap="QA_ResultMap_QA">
+		select wtid,flid,bzwt,dnda,dwda,wjm from wm_qa 
+		<dynamic prepend="where">
+			<isNotEmpty property="flid" prepend="and">
+				flid = #flid#
+			</isNotEmpty>
+			<isNotEmpty property="bzwt" prepend="and">
+				bzwt = #bzwt#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<delete id="QA_deleteQaByKey" parameterClass="java.util.Map">
+		delete from wm_qa where wtid=#wtid# 
+	</delete>
+	
+	<insert id="QA_insertQa" parameterClass="com.tiancom.pas.qa.QA">
+		insert into wm_qa(flid,bzwt,dnda,dwda,wjm) values(#flid#,#bzwt#,#dnda#,#dwda#,#wjm#)
+		<selectKey resultClass="int" keyProperty="wtid">
+			SELECT LAST_INSERT_ID() 
+		</selectKey>
+	</insert>
+	
+	<update id="QA_UpdateQa" parameterClass="com.tiancom.pas.qa.QA" >
+		UPDATE wm_qa 
+		<dynamic prepend="set">
+			<isNotEmpty property="flid" prepend=",">
+				flid = #flid#
+			</isNotEmpty>
+			<isNotEmpty property="bzwt" prepend=",">
+				bzwt = #bzwt#
+			</isNotEmpty>
+			<isNotEmpty property="dnda" prepend=",">
+				dnda = #dnda#
+			</isNotEmpty>
+			<isNotEmpty property="dwda" prepend=",">
+				dwda = #dwda#
+			</isNotEmpty>
+			<isNotEmpty property="wjm" prepend=",">
+				wjm = #wjm#
+			</isNotEmpty>
+		</dynamic>
+		where wtid = #wtid#
+	</update>
+</sqlMap>

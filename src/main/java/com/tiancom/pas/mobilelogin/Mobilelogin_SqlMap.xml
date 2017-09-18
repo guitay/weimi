@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="mobilelogin" >
+	 <resultMap id="rsglygxxMap" class="com.tiancom.pas.mobilelogin.Rsglygxx">  
+	 	<result property="ygid" jdbcType="INTEGER"  column="ygid"/>
+	 	<result property="xm" jdbcType="VARCHAR" column="xm"/>
+	 	<result property="xb" jdbcType="VARCHAR" column="xb"/>
+	 	<result property="dlmc" jdbcType="VARCHAR"  column="dlmc"/>
+	 	<result property="dlmm" jdbcType="VARCHAR" column="dlmm"/>
+	 	<result property="ygbh" jdbcType="VARCHAR" column="ygbh"/>
+	 	<result property="ygzt" jdbcType="INTEGER"  column="ygzt"/>
+	 	<result property="scdl" jdbcType="VARCHAR" column="scdl"/>
+	 	<result property="bmid" jdbcType="VARCHAR" column="bmid"/>
+	 	<result property="bmbh" jdbcType="VARCHAR" column="bmbh"/>
+    </resultMap>
+    
+    <select id="selectByDlmc2" parameterClass="java.lang.String" resultMap="rsglygxxMap">
+    	select ygid,xm,xb,dlmc,dlmm,ygzt,ygbh,scdl,a.bmid,bmbh 
+    	from RSGL_YGXX a 
+    	inner join rsgl_bmxx b on b.bmid=a.bmid
+    	where dlmc = #dlmc#;
+    </select>
+    <select id="selectByYgid" parameterClass="java.lang.String" resultMap="rsglygxxMap">
+    	select ygid,xm,xb,dlmc,dlmm,ygzt,ygbh,scdl,bmid from RSGL_YGXX
+    	where ygid = #ygid#;
+    </select>
+    <select id="cqgl_selectKqts" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select csz from xtb_xtcs where csmc='SYS_KQTS'
+	</select>
+    <select id="kqgl_selectKqfList" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		<![CDATA[
+		SELECT kqrq,zt, case when zt in (0,4) then 0 when zt=2 then 1 else xgbz end xgbz
+		from (
+		select sjw.tjrq kqrq, CASE WHEN sjw.TJRQ<= (SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d'))  THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 0  ELSE 1 END)
+		                      WHEN sjw.TJRQ>(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d')) AND SJW.TJRQ<=(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE(SYSDATE()))),'%Y%m%d') ) THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 2  ELSE 3 END)
+		                      ELSE 4 END zt, 1 xgbz 
+		from csb_sjw sjw
+		inner join csb_sjw sjw2 on sjw.tjrq between sjw2.yc and sjw2.ym
+		left join xtb_xtcs cs on cs.csmc='SYS_KQTS'
+		left join kqgl_ygkqjl kqjl on sjw.tjrq=kqjl.kqrq and kqjl.ygid=$ygid$
+		where sjw2.tjrq=$kqrq$ and exists (select 1 from kqgl_ygkqnr kqnr where kqjl.jldh=kqnr.jldh and kqnr.ywfy='1')
+		  and not exists (select 1
+							from CWGL_FYBXD bxd, cwgl_fybxdmx  clbx   
+							where  bxd.bxdh=clbx.bxdh  and kqjl.jldh=clbx.jldh  and bxd.zt in ('0','1')
+							union ALL
+							select 1
+							from CWGL_FYBXD bxd, cwgl_bxdmx_bdfy  bdbx   
+							where  bxd.bxdh=bdbx.bxdh  and kqjl.jldh=bdbx.jldh and bxd.zt in ('0','1'))
+		union all
+        select sjw.tjrq kqrq, CASE WHEN sjw.TJRQ<= (SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d'))  THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 0  ELSE 1 END)
+		                      WHEN sjw.TJRQ>(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d')) AND SJW.TJRQ<=(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE(SYSDATE()))),'%Y%m%d') ) THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 2  ELSE 3 END)
+		                      ELSE 4 END zt, CASE WHEN sjw.TJRQ>(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d')) AND SJW.TJRQ<=(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE(SYSDATE()))),'%Y%m%d') ) then 1 else 0 end xgbz 
+		from csb_sjw sjw
+		inner join csb_sjw sjw2 on sjw.tjrq between sjw2.yc and sjw2.ym
+		left join xtb_xtcs cs on cs.csmc='SYS_KQTS'
+		left join kqgl_ygkqjl kqjl on sjw.tjrq=kqjl.kqrq and kqjl.ygid=$ygid$
+		where sjw2.tjrq=$kqrq$ and not exists (select 1 from kqgl_ygkqnr kqnr where kqjl.jldh=kqnr.jldh and kqnr.ywfy='1')
+		  and not exists (select 1
+						from CWGL_FYBXD bxd, cwgl_fybxdmx  clbx   
+						where  bxd.bxdh=clbx.bxdh  and kqjl.jldh=clbx.jldh  and bxd.zt in ('0','1')
+						union ALL
+						select 1
+						from CWGL_FYBXD bxd, cwgl_bxdmx_bdfy  bdbx   
+						where  bxd.bxdh=bdbx.bxdh  and kqjl.jldh=bdbx.jldh and bxd.zt in ('0','1'))		
+		union ALL
+		select sjw.tjrq kqrq, CASE WHEN sjw.TJRQ<= (SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d'))  THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 0  ELSE 1 END)
+		                      WHEN sjw.TJRQ>(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE_ADD(SYSDATE(),INTERVAL -cs.CSZ DAY))),'%Y%m%d')) AND SJW.TJRQ<=(SELECT FROM_UNIXTIME((SELECT unix_timestamp(DATE(SYSDATE()))),'%Y%m%d') ) THEN ( CASE WHEN  kqjl.JLDH IS NULL THEN 2  ELSE 3 END)
+		                      ELSE 4 END zt,0 xgbz
+		from csb_sjw sjw
+		inner join csb_sjw sjw2 on sjw.tjrq between sjw2.yc and sjw2.ym
+		left join xtb_xtcs cs on cs.csmc='SYS_KQTS'
+		left join kqgl_ygkqjl kqjl on sjw.tjrq=kqjl.kqrq and kqjl.ygid=$ygid$
+		where sjw2.tjrq=$kqrq$ 
+		  and exists (select 1
+					from CWGL_FYBXD bxd, cwgl_fybxdmx  clbx   
+					where  bxd.bxdh=clbx.bxdh  and kqjl.jldh=clbx.jldh  and bxd.zt in ('0','1')
+					union ALL
+					select 1
+					from CWGL_FYBXD bxd, cwgl_bxdmx_bdfy  bdbx   
+					where  bxd.bxdh=bdbx.bxdh  and kqjl.jldh=bdbx.jldh and bxd.zt in ('0','1') )
+		 ) a
+		order by 1
+		]]>
+	</select>
+	
+ </sqlMap>

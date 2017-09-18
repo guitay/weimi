@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+	<form-beans>
+  	    <form-bean name="mobilewForm" type="com.tiancom.pas.mobilew.MobilewForm" />
+	</form-beans>
+	
+	<action-mappings>	
+  	   <action path="/mobilew"
+  	   		   name="mobilewForm"
+  	   		   attribute="mobilewForm"
+  	   		   scope="request"
+  	   		   input="/../m/w.jsp"
+  	   		   parameter="method"
+  	   		   validate="true"
+  	   		   type="com.tiancom.pas.mobilew.MobilewAction">
+  	   		<forward name="wdbx" path="/../m/wdbx.jsp" />
+  	   		<forward name="bxdxq" path="/../m/bxdxq.jsp" />
+  	   		<forward name="bxdxg" path="/../m/bxdxg.jsp" />
+  	   		<forward name="ytjzdbj" path="/../m/ytjzdbj.jsp" />
+  	   		<forward name="bxsplb" path="/../m/bxsplb.jsp" />
+  	   </action>  
+	</action-mappings>
+	
+	<message-resources parameter="com.tiancom.pas.common.framework.struts.ApplicationResources" />
+</struts-config>
+

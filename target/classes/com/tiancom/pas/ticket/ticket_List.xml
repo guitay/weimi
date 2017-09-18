@@ -1,0 +1,22 @@
+<table id="ticket" width="800" height="400" page="true">
+	<col id="operation" title="操作" width="50" align="center" />
+	<col id="ddbh" title="订单编号" width="50" hidden="false" />
+	<col id="xmmc" title="项目/客户简称" width="200" hidden="false" />
+	<col id="khmc" title="客户名称" width="200" hidden="true" />
+	<col id="ygbh" title="员工编号" width="130" hidden="true" />
+	<col id="ygxm" title="员工姓名" width="60" hidden="false" />
+	<col id="bmmc" title="部门" width="120" hidden="false" />
+	
+	<col id="cfd" title="出发地" width="130" hidden="false" />
+	<col id="mdd" title="目的地" width="120" hidden="false" />
+	
+	
+	<col id="cfsj" title="出发时间" width="100" hidden="false" />
+	<col id="jyhb" title="建议航班" width="120" hidden="false" />
+	<col id="comment" title="备注" width="120" hidden="false" />
+	<col id="cpxx" title="出票信息" width="120" hidden="false" />
+	
+	<col id="taskId" title="" width="10" hidden="true" />
+	<col id="procInstId" title="" width="10" hidden="true" />
+	<col id="flowDesc" title="流程描述" width="500" hidden="true"/>
+</table>

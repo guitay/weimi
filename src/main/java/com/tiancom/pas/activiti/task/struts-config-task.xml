@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+	<form-beans>
+  	    <form-bean name="taskForm" type="com.tiancom.pas.activiti.task.NBTaskForm" />
+	</form-beans>
+	
+	<action-mappings>	
+  	   <action path="/task"
+  	   		   name="taskForm"
+  	   		   attribute="taskForm"
+  	   		   scope="request"
+  	   		   input="/../task/list.jsp"
+  	   		   parameter="method"
+  	   		   validate="true"
+  	   		   type="com.tiancom.pas.activiti.task.NBTaskAction">
+  	   		<forward name="apply" path="/../task/apply.jsp" />
+  	   		<forward name="list" path="/../task/list.jsp" />
+  	   		<forward name="task" path="/../task/task.jsp" />
+  	   </action>  
+	</action-mappings>
+	
+	<message-resources parameter="com.tiancom.pas.common.framework.struts.ApplicationResources" />
+</struts-config>
+

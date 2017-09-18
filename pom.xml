@@ -133,5 +133,6 @@
 		<module>weimi-api</module>
 		<module>weimi-common</module>
 		<module>weimi-service</module>
-	</modules>
+	<module>weimi-dao</module>
+	/modules>
 </project>

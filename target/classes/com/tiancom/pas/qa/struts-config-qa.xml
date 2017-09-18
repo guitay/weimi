@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+	<form-beans>
+  	    <form-bean name="qaForm" type="com.tiancom.pas.qa.QAForm" />
+	</form-beans>
+	
+	<action-mappings>	
+  	   <action path="/qa"
+  	   		   name="qaForm"
+  	   		   attribute="qaForm"
+  	   		   scope="request"
+  	   		   input="/../m/w.jsp"
+  	   		   parameter="method"
+  	   		   validate="true"
+  	   		   type="com.tiancom.pas.qa.QAAction">
+  	   		<forward name="list" path="/../qa/list.jsp" />
+  	   		<forward name="edit" path="/../qa/edit.jsp" />
+  	   		<forward name="search" path="/../qa/search.jsp" />
+  	   		<forward name="show" path="/../qa/show.jsp" />
+  	   </action>  
+	</action-mappings>
+	
+	<message-resources parameter="com.tiancom.pas.common.framework.struts.ApplicationResources" />
+</struts-config>
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+	<data-sources />
+	<form-beans>
+		<form-bean name="MobileLoginForm" type="com.tiancom.pas.mobilelogin.MobileLoginForm" />
+	</form-beans>
+
+	<global-exceptions />
+	<global-forwards />
+	<action-mappings>
+		
+		<action 
+		path="/mobilelogin" 
+		name="MobileLoginForm" 
+		attribute="MobileLoginForm" 
+		input="/../m/login.jsp" 
+		scope="request" 
+		parameter="method" 
+		validate="true" 
+		type="com.tiancom.pas.mobilelogin.MobileLoginAction">
+			<forward name="cqgl" path="/../m/cqgl.jsp"></forward>
+			<forward name="login" path="/../m/login.jsp"></forward>
+			<forward name="error" path="/error.jsp" />
+			<forward name="index" path="/../m/index.jsp" />
+			<forward name="wxbd" path="/../m/wxbd.jsp" />
+		</action>
+
+	</action-mappings> 
+	
+	<message-resources parameter="com.tiancom.pas.common.framework.struts.ApplicationResources" />
+</struts-config>

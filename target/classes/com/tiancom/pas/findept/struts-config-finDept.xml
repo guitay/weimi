@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+	<form-beans>
+  	    <form-bean name="finDeptForm" type="com.tiancom.pas.findept.FinDeptForm" />
+	</form-beans>
+	
+	<action-mappings>	
+  	   <action path="/finDept"
+  	   		   name="finDeptForm"
+  	   		   attribute="finDeptForm"
+  	   		   scope="request"
+  	   		   input="/../findept/auditList.jsp"
+  	   		   parameter="method"
+  	   		   validate="true"
+  	   		   type="com.tiancom.pas.findept.FinDeptAction">
+  	   		<forward name="List" path="/../WEB-INF/classes/com/tiancom/pas/findept/List.jsp" />
+  	   		<forward name="bxdzd" path="/../WEB-INF/classes/com/tiancom/pas/findept/ZDList.jsp" />
+  	   		<forward name="bxdlc" path="/../WEB-INF/classes/com/tiancom/pas/findept/LCList.jsp" />
+  	   		<forward name="auditList" path="/../findept/auditList.jsp" />
+  	   		<forward name="cashierList" path="/../findept/cashierList.jsp" />
+  	   		<forward name="assistantList" path="/../findept/assistantList.jsp" />
+  	   		<forward name="wmzdList" path="/../findept/wmzdList.jsp" />
+  	   </action>  
+	</action-mappings>
+	
+	<message-resources parameter="com.tiancom.pas.common.framework.struts.ApplicationResources" />
+</struts-config>
+

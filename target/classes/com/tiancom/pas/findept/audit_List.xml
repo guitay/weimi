@@ -1,0 +1,14 @@
+<table id="audit" width="800" height="400" page="true">
+	<col id="operation" title="操作" width="130" align="center" />
+	<col id="bxdh" title="报销单号" width="100" hidden="false" />
+	<col id="xmjc" title="项目/客户简称" width="200" hidden="false" />
+	<col id="bmmc" title="报销部门" width="120" hidden="false" />
+	<col id="xm" title="姓名" width="130" hidden="false" />
+	<col id="ccts" title="出差天数" width="50" hidden="false" />
+	<col id="bxze" title="报销总额" width="100" hidden="false" align="right" />
+	<col id="qsrq" title="起始日期" width="120" hidden="false" />
+	<col id="jsrq" title="结束日期" width="120" hidden="false" />
+	<col id="taskId" title="" width="10" hidden="true" />
+	<col id="procInstId" title="" width="10" hidden="true" />
+	<col id="flowDesc" title="流程描述" width="500" hidden="true"/>
+</table>

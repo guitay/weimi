@@ -1,0 +1,10 @@
+<table id="wmzd" width="800" height="400" page="true">
+	<col id="operation" title="操作" width="130" align="center" hidden="true"/>
+	<col id="bxdh" title="报销单号" width="100" hidden="false" />
+	<col id="xmjc" title="项目简称" width="200" hidden="false" />
+	<col id="bmmc" title="部门" width="120" hidden="false" />
+	<col id="xm" title="姓名" width="130" hidden="false" />
+	<col id="zdje" title="账单金额" width="100" hidden="false" />
+	<col id="rq" title="日期" width="100" hidden="false" />
+	<col id="zdsm" title="账单说明" width="200" hidden="false" />
+</table>

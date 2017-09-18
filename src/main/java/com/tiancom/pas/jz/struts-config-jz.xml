@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+	<form-beans>
+  	    <form-bean name="jzForm" type="com.tiancom.pas.jz.JzForm" />
+	</form-beans>
+	
+	<action-mappings>	
+  	   <action path="/jz"
+  	   		   name="jzForm"
+  	   		   attribute="jzForm"
+  	   		   scope="request"
+  	   		   input="/../ticket/auditList.jsp"
+  	   		   parameter="method"
+  	   		   validate="true"
+  	   		   type="com.tiancom.pas.jz.JzAction">
+  	   		<forward name="list" path="/../WEB-INF/classes/com/tiancom/pas/jz/jzdList.jsp" />
+  	   		<forward name="jzdlc" path="/../WEB-INF/classes/com/tiancom/pas/jz/jzdLC.jsp" />
+  	   		<forward name="wdjz" path="/../m/wdjz.jsp" />
+  	   		<forward name="jzsp" path="/../m/jzsplb.jsp"/>
+  	   		<forward name="jzdxq" path="/../m/jzdxq.jsp"/>
+  	   		<forward name="jzdxg" path="/../m/jzdxg.jsp"/>
+  	   </action>  
+	</action-mappings>
+	
+	<message-resources parameter="com.tiancom.pas.common.framework.struts.ApplicationResources" />
+</struts-config>
+

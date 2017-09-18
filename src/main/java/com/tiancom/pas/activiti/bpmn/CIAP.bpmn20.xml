@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="CIAP" name="现金借支流程(CIA Cash in advance)" isExecutable="true">
+    <documentation>现金借支流程（CIAP cash in advance）</documentation>
+    <startEvent id="CIAP-Start" name="CIAP-Start">
+      <documentation>现金借支（CIAP cash in advance）流程开始</documentation>
+      <extensionElements>
+        <activiti:formProperty id="applier" name="申请人" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="bmbh" name="部门编号" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="jzdh" name="借支单号" type="string" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="CIA-Apply" name="借支申请" activiti:assignee="${applier}"></userTask>
+    <sequenceFlow id="sid-C52AC490-5F8F-47C5-B20B-A35F01D5116C" sourceRef="CIAP-Start" targetRef="CIA-Apply"></sequenceFlow>
+    <userTask id="Leader-Auditor" name="领导审批" activiti:candidateGroups="${bmbh}-auditor">
+      <extensionElements>
+        <activiti:formProperty id="approved" name="是否同意" type="boolean" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="Decision1" name="Decision1"></exclusiveGateway>
+    <userTask id="Assistant-company" name="助理受理" activiti:candidateGroups="assistant">
+      <documentation>其他</documentation>
+    </userTask>
+    <endEvent id="CIAP-End" name="CIAP-End">
+      <documentation>员工借支流程结束</documentation>
+    </endEvent>
+    <sequenceFlow id="sid-1D727CD6-497B-48B9-B460-47C33DA7E781" sourceRef="CIA-Apply" targetRef="Leader-Auditor"></sequenceFlow>
+    <sequenceFlow id="sid-8830C17D-FC2A-4698-997C-0EDDC5326D23" sourceRef="Leader-Auditor" targetRef="Decision1"></sequenceFlow>
+    <exclusiveGateway id="assistant-router"></exclusiveGateway>
+    <userTask id="assistant-zjs" name="助理受理" activiti:candidateGroups="assistant-zjs">
+      <documentation>业务咨询部\吉林\山西</documentation>
+    </userTask>
+    <userTask id="assistant-shnh" name="助理受理" activiti:candidateGroups="assistant-shnh">
+      <documentation>山东\湖南\内蒙古\河南</documentation>
+    </userTask>
+    <userTask id="assistant-sjzg" name="助理受理" activiti:candidateGroups="assistant-sjzg">
+      <documentation>四川\江苏\浙江\贵州</documentation>
+    </userTask>
+    <userTask id="assistant-gk" name="助理受理" activiti:candidateGroups="assistant-gk">
+      <documentation>广东\客服</documentation>
+    </userTask>
+    <sequenceFlow id="sid-110964BC-E324-41EA-8A9E-0EF44B12CDD9" sourceRef="assistant-gk" targetRef="finDept-Auditing"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="assistant-router" targetRef="assistant-sjzg">
+      <documentation>四川\江苏\浙江\贵州</documentation>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${bmbh=='0100'||bmbh=='0110'||bmbh=='00502'||bmbh=='0090'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="assistant-router" targetRef="assistant-shnh">
+      <documentation>山东\湖南\内蒙古\河南</documentation>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${bmbh=='00503'||bmbh=='01001'||bmbh=='00501'||bmbh=='01002'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="assistant-router" targetRef="assistant-gk">
+      <documentation>广东\客服</documentation>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${bmbh=='0060'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-2C00B9BB-4A12-4BEF-BEFA-D32FC92DE1D1" sourceRef="assistant-sjzg" targetRef="finDept-Auditing"></sequenceFlow>
+    <userTask id="finDept-Auditing" name="财务审批" activiti:candidateGroups="accountant">
+      <extensionElements>
+        <activiti:formProperty id="approved" name="是否同意" type="boolean" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-B12460DA-CD84-4A58-B975-2A2C588A9F00" sourceRef="Assistant-company" targetRef="finDept-Auditing"></sequenceFlow>
+    <sequenceFlow id="sid-09885A50-6EC3-49A9-B432-A0DCA489FB19" sourceRef="assistant-shnh" targetRef="finDept-Auditing"></sequenceFlow>
+    <sequenceFlow id="sid-B50C7A85-266C-4C2E-BBE9-FA926D8EC16A" sourceRef="assistant-zjs" targetRef="finDept-Auditing"></sequenceFlow>
+    <userTask id="cashier-pay" name="出纳出账" activiti:candidateGroups="cashier">
+      <extensionElements>
+        <activiti:formProperty id="是否出账" type="string" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="applier-confirm" name="收账确认" activiti:assignee="${applier}"></userTask>
+    <sequenceFlow id="sid-515EC3E9-B2C3-4F9C-B7F1-A645F319A2A9" sourceRef="cashier-pay" targetRef="applier-confirm"></sequenceFlow>
+    <sequenceFlow id="sid-F93380A5-E5BE-4FA3-B771-767FDEEE31EB" sourceRef="applier-confirm" targetRef="CIAP-End"></sequenceFlow>
+    <exclusiveGateway id="cw-decision">
+      <documentation>财务审批</documentation>
+    </exclusiveGateway>
+    <sequenceFlow id="sid-D3E349FB-CB16-4E78-87B8-FF72AEBFD2F5" sourceRef="finDept-Auditing" targetRef="cw-decision"></sequenceFlow>
+    <sequenceFlow id="sid-2BFA683E-DC79-421A-A3F7-DE7AACBA8044" name="审批通过" sourceRef="Decision1" targetRef="assistant-router">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-DDCB45FC-57C6-49E5-9299-35AA347DBC99" name="审批不通过" sourceRef="Decision1" targetRef="CIA-Apply">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!approved}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="cw-approved" name="通过" sourceRef="cw-decision" targetRef="cashier-pay">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="cw-notApproved" name="不通过" sourceRef="cw-decision" targetRef="CIA-Apply">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!approved}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="assistant-router" targetRef="assistant-zjs">
+      <documentation>业务咨询部\吉林\山西</documentation>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${bmbh=='0050'||bmbh=='01003'||bmbh=='01004'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="assistant-router" targetRef="Assistant-company">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${bmbh!='0050'&&bmbh!='01003'&&bmbh!='01004'&&bmbh!='00503'&&bmbh!='01001'&&bmbh!='00501'&&bmbh!='01002'&&bmbh!='0100'&&bmbh!='0110'&&bmbh!='00502'&&bmbh!='0090'&&bmbh!='0060'}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CIAP">
+    <bpmndi:BPMNPlane bpmnElement="CIAP" id="BPMNPlane_CIAP">
+      <bpmndi:BPMNShape bpmnElement="CIAP-Start" id="BPMNShape_CIAP-Start">
+        <omgdc:Bounds height="35.0" width="35.0" x="17.0" y="307.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="CIA-Apply" id="BPMNShape_CIA-Apply">
+        <omgdc:Bounds height="80.0" width="100.0" x="120.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Leader-Auditor" id="BPMNShape_Leader-Auditor">
+        <omgdc:Bounds height="80.0" width="100.0" x="255.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Decision1" id="BPMNShape_Decision1">
+        <omgdc:Bounds height="40.0" width="40.0" x="390.0" y="305.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Assistant-company" id="BPMNShape_Assistant-company">
+        <omgdc:Bounds height="80.0" width="100.0" x="600.0" y="495.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="CIAP-End" id="BPMNShape_CIAP-End">
+        <omgdc:Bounds height="35.0" width="35.0" x="1280.0" y="307.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assistant-router" id="BPMNShape_assistant-router">
+        <omgdc:Bounds height="40.0" width="40.0" x="480.0" y="305.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assistant-zjs" id="BPMNShape_assistant-zjs">
+        <omgdc:Bounds height="80.0" width="100.0" x="600.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assistant-shnh" id="BPMNShape_assistant-shnh">
+        <omgdc:Bounds height="80.0" width="100.0" x="600.0" y="195.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assistant-sjzg" id="BPMNShape_assistant-sjzg">
+        <omgdc:Bounds height="80.0" width="100.0" x="600.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assistant-gk" id="BPMNShape_assistant-gk">
+        <omgdc:Bounds height="80.0" width="100.0" x="600.0" y="390.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="finDept-Auditing" id="BPMNShape_finDept-Auditing">
+        <omgdc:Bounds height="80.0" width="100.0" x="795.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cashier-pay" id="BPMNShape_cashier-pay">
+        <omgdc:Bounds height="80.0" width="100.0" x="1005.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="applier-confirm" id="BPMNShape_applier-confirm">
+        <omgdc:Bounds height="80.0" width="100.0" x="1140.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cw-decision" id="BPMNShape_cw-decision">
+        <omgdc:Bounds height="40.0" width="40.0" x="930.0" y="305.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-C52AC490-5F8F-47C5-B20B-A35F01D5116C" id="BPMNEdge_sid-C52AC490-5F8F-47C5-B20B-A35F01D5116C">
+        <omgdi:waypoint x="52.0" y="324.0"></omgdi:waypoint>
+        <omgdi:waypoint x="120.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-1D727CD6-497B-48B9-B460-47C33DA7E781" id="BPMNEdge_sid-1D727CD6-497B-48B9-B460-47C33DA7E781">
+        <omgdi:waypoint x="220.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="255.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-8830C17D-FC2A-4698-997C-0EDDC5326D23" id="BPMNEdge_sid-8830C17D-FC2A-4698-997C-0EDDC5326D23">
+        <omgdi:waypoint x="355.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-110964BC-E324-41EA-8A9E-0EF44B12CDD9" id="BPMNEdge_sid-110964BC-E324-41EA-8A9E-0EF44B12CDD9">
+        <omgdi:waypoint x="700.0" y="430.0"></omgdi:waypoint>
+        <omgdi:waypoint x="845.0" y="430.0"></omgdi:waypoint>
+        <omgdi:waypoint x="845.0" y="365.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="520.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="500.0" y="305.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="235.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="235.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="500.0" y="345.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="430.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="430.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-2C00B9BB-4A12-4BEF-BEFA-D32FC92DE1D1" id="BPMNEdge_sid-2C00B9BB-4A12-4BEF-BEFA-D32FC92DE1D1">
+        <omgdi:waypoint x="700.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="795.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-B12460DA-CD84-4A58-B975-2A2C588A9F00" id="BPMNEdge_sid-B12460DA-CD84-4A58-B975-2A2C588A9F00">
+        <omgdi:waypoint x="700.0" y="535.0"></omgdi:waypoint>
+        <omgdi:waypoint x="845.0" y="535.0"></omgdi:waypoint>
+        <omgdi:waypoint x="845.0" y="365.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-09885A50-6EC3-49A9-B432-A0DCA489FB19" id="BPMNEdge_sid-09885A50-6EC3-49A9-B432-A0DCA489FB19">
+        <omgdi:waypoint x="700.0" y="235.0"></omgdi:waypoint>
+        <omgdi:waypoint x="845.0" y="235.0"></omgdi:waypoint>
+        <omgdi:waypoint x="845.0" y="285.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-B50C7A85-266C-4C2E-BBE9-FA926D8EC16A" id="BPMNEdge_sid-B50C7A85-266C-4C2E-BBE9-FA926D8EC16A">
+        <omgdi:waypoint x="700.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="845.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="845.0" y="285.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-515EC3E9-B2C3-4F9C-B7F1-A645F319A2A9" id="BPMNEdge_sid-515EC3E9-B2C3-4F9C-B7F1-A645F319A2A9">
+        <omgdi:waypoint x="1105.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1140.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-F93380A5-E5BE-4FA3-B771-767FDEEE31EB" id="BPMNEdge_sid-F93380A5-E5BE-4FA3-B771-767FDEEE31EB">
+        <omgdi:waypoint x="1240.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1280.0" y="324.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-D3E349FB-CB16-4E78-87B8-FF72AEBFD2F5" id="BPMNEdge_sid-D3E349FB-CB16-4E78-87B8-FF72AEBFD2F5">
+        <omgdi:waypoint x="895.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="930.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-2BFA683E-DC79-421A-A3F7-DE7AACBA8044" id="BPMNEdge_sid-2BFA683E-DC79-421A-A3F7-DE7AACBA8044">
+        <omgdi:waypoint x="430.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="325.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="48.0" x="429.0" y="304.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-DDCB45FC-57C6-49E5-9299-35AA347DBC99" id="BPMNEdge_sid-DDCB45FC-57C6-49E5-9299-35AA347DBC99">
+        <omgdi:waypoint x="410.0" y="345.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="420.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="420.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="365.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="60.0" x="275.0" y="399.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="cw-approved" id="BPMNEdge_cw-approved">
+        <omgdi:waypoint x="970.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1005.0" y="325.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="970.0" y="325.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="cw-notApproved" id="BPMNEdge_cw-notApproved">
+        <omgdi:waypoint x="950.0" y="305.0"></omgdi:waypoint>
+        <omgdi:waypoint x="950.0" y="57.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="57.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="285.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="965.0" y="196.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="500.0" y="305.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="500.0" y="345.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="535.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="535.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
