@@ -1,6 +1,0 @@
-<table id="qa" width="800" height="400" page="true">
-	<col id="operation" title="操作" width="50" align="center" />
-	<col id="wtid" title="问题id" width="50" hidden="true" />
-	<col id="bzwt" title="标准问题" width="300" hidden="false" />
-	<col id="wjm" title="文件名" width="300" hidden="false" />
-</table>
